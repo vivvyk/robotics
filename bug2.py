@@ -62,6 +62,11 @@ class Bug2():
 		driving_forward = True
 		while True:
 
+			(position, rotation) = self.get_odom()
+			if self.isgoal(position.x):
+				print "GOAL REACHED!"
+				break
+
 			if driving_forward:
 				move_cmd.linear.x = linear_speed
 				if self.g_ahead_range != None and self.g_ahead_range < 0.6:
@@ -73,7 +78,7 @@ class Bug2():
 				self.r.sleep()
 
 				#Turn LEFT until obstacle is no longer detected.
-				self.rotate(10)
+				self.rotate(30)
 				while not math.isnan(self.g_right_range):
 					self.rotate(15)
 
@@ -85,12 +90,16 @@ class Bug2():
 						self.translate(0.15)
 
 					#Turn incrementally left.
-					print('r',self.g_right_range)
-					print('l',self.g_left_range)
 					if self.g_right_range < 0.8:
-						self.rotate(10)
+						self.rotate(15)
 						self.translate(0.15)
 
+					(position, rotation) = self.get_odom()
+					if self.mline(position.x, position.y):
+						driving_forward = True
+						rot_deg = -1 * rotation * 180/pi
+						self.rotate(rot_deg)
+						break
 
 			self.cmd_vel.publish(move_cmd)
 			self.r.sleep()
@@ -104,9 +113,15 @@ class Bug2():
 		return (Point(*trans), quat_to_angle(Quaternion(*rot)))
 
 	@staticmethod
+	def isgoal(x):
+		if (9.9 < x < 10.1):
+			return True
+		return False
+
+	@staticmethod
 	def mline(x, y):
 		print x, y
-		if abs(y) <= 0.1 and (0.1 <= x <= 10.1):
+		if abs(y) <= 0.065 and (0.1 <= x <= 10.1):
 			return True
 		return False
 
@@ -138,7 +153,7 @@ class Bug2():
 
 		move_cmd = Twist()
 		self.cmd_vel.publish(move_cmd)
-		rospy.sleep(0.2)
+		rospy.sleep(0.4)
 
 	def rotate(self, deg):
 		goal_angle = deg * pi / 180.0
