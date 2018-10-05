@@ -69,7 +69,7 @@ class Bug2():
 
 			if driving_forward:
 				move_cmd.linear.x = linear_speed
-				if self.g_ahead_range != None and self.g_ahead_range < 0.6:
+				if self.g_ahead_range != None and self.g_ahead_range < 0.8:
 					driving_forward = False
 
 			else:
@@ -80,19 +80,23 @@ class Bug2():
 				#Turn LEFT until obstacle is no longer detected.
 				self.rotate(30)
 				while not math.isnan(self.g_right_range):
+					if self.g_right_range > 1:
+						break
 					self.rotate(15)
 
 				#Follow object
 				while True:
+					self.translate(0.15)
+
 					#Turn right until edge
-					if math.isnan(self.g_right_range) or self.g_right_range > 0.8:
+					while math.isnan(self.g_right_range) or self.g_right_range > 0.8:
 						self.rotate(-10)
-						self.translate(0.15)
+						#self.translate(0.15)
 
 					#Turn incrementally left.
-					if self.g_right_range < 0.8:
+					while self.g_right_range < 0.8:
 						self.rotate(15)
-						self.translate(0.15)
+						#self.translate(0.15)
 
 					(position, rotation) = self.get_odom()
 					if self.mline(position.x, position.y):
