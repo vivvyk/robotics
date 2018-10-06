@@ -60,8 +60,9 @@ class Bug2():
 
 		move_cmd = Twist()
 		driving_forward = True
-		while True:
+		hit_points = set()
 
+		while True:
 			(position, rotation) = self.get_odom()
 			if self.isgoal(position.x):
 				print "GOAL REACHED!"
@@ -70,12 +71,19 @@ class Bug2():
 			if driving_forward:
 				move_cmd.linear.x = linear_speed
 				if self.g_ahead_range != None and self.g_ahead_range < 0.8:
+					if self.check_hitpoint(position, hit_points):
+						print "HIT POINT REVISITED, NO PATH POSSIBLE."
+						break
 					driving_forward = False
 
 			else:
 				print "obstacle detected!"
 				self.cmd_vel.publish(Twist())
 				self.r.sleep()
+
+				(position, rotation) = self.get_odom()
+				print "HIT POINT: " + str(position.x) + ", " + str(position.y)
+				hit_points.add(position)
 
 				#Turn LEFT until obstacle is no longer detected.
 				self.rotate(30)
@@ -86,7 +94,7 @@ class Bug2():
 
 				#Follow object
 				while True:
-					self.translate(0.15)
+					self.translate(0.75) #originally 0.15
 
 					#Turn right until edge
 					while math.isnan(self.g_right_range) or self.g_right_range > 0.8:
@@ -95,11 +103,12 @@ class Bug2():
 
 					#Turn incrementally left.
 					while self.g_right_range < 0.8:
-						self.rotate(15)
+						self.rotate(15) #otherwise, 15
 						#self.translate(0.15)
 
 					(position, rotation) = self.get_odom()
 					if self.mline(position.x, position.y):
+						print "mline found!"
 						driving_forward = True
 						rot_deg = -1 * rotation * 180/pi
 						self.rotate(rot_deg)
@@ -124,9 +133,21 @@ class Bug2():
 
 	@staticmethod
 	def mline(x, y):
-		print x, y
-		if abs(y) <= 0.065 and (0.1 <= x <= 10.1):
+		if abs(y) <= 0.5 and (0.1 <= x <= 10.1): #used to be 0.65
 			return True
+		return False
+
+	def check_hitpoint(self, position, hit_point):
+		cur_x = position.x
+		cur_y = position.y
+
+		for point in hit_point:
+			if abs(point.x - cur_x) > 0.5:
+				continue
+			if abs(point.y - cur_y) > 0.5:
+				continue
+			return True
+
 		return False
 
 
