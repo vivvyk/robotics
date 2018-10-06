@@ -71,9 +71,9 @@ class Bug2():
 			if driving_forward:
 				move_cmd.linear.x = linear_speed
 				if self.g_ahead_range != None and self.g_ahead_range < 0.8:
-					if self.check_hitpoint(position, hit_points):
-						print "HIT POINT REVISITED, NO PATH POSSIBLE."
-						break
+					#if self.check_hitpoint(position, hit_points):
+					#	print "HIT POINT REVISITED, NO PATH POSSIBLE."
+					#	break
 					driving_forward = False
 
 			else:
@@ -94,7 +94,7 @@ class Bug2():
 
 				#Follow object
 				while True:
-					self.translate(0.75) #originally 0.15
+					self.translate(0.2) #originally 0.15
 
 					#Turn right until edge
 					while math.isnan(self.g_right_range) or self.g_right_range > 0.8:
@@ -103,7 +103,7 @@ class Bug2():
 
 					#Turn incrementally left.
 					while self.g_right_range < 0.8:
-						self.rotate(15) #otherwise, 15
+						self.rotate(25) #otherwise, 15
 						#self.translate(0.15)
 
 					(position, rotation) = self.get_odom()
@@ -133,7 +133,7 @@ class Bug2():
 
 	@staticmethod
 	def mline(x, y):
-		if abs(y) <= 0.5 and (0.1 <= x <= 10.1): #used to be 0.65
+		if abs(y) <= 0.1 and (0.1 <= x <= 10.1): #used to be 0.65
 			return True
 		return False
 
@@ -142,9 +142,9 @@ class Bug2():
 		cur_y = position.y
 
 		for point in hit_point:
-			if abs(point.x - cur_x) > 0.5:
+			if abs(point.x - cur_x) > 0.1:
 				continue
-			if abs(point.y - cur_y) > 0.5:
+			if abs(point.y - cur_y) > 0.1:
 				continue
 			return True
 
