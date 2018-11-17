@@ -161,7 +161,7 @@ if __name__ == "__main__":
             print("\n")
 
 
-            if abs(q_goal.x - q_new.x) < 5 and abs(q_goal.y - q_new.y) < 5:
+            if abs(q_goal.x - q_new.x) < 2 and abs(q_goal.y - q_new.y) < 2:
                 printc(q_new)
                 print("FOUND GOAL")
                 goal_found = True
