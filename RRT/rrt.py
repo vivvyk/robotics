@@ -59,7 +59,8 @@ def rand(dim_x, dim_y):
     # 600 by 600 map
     # Obstacle detection not implemented yet
     random.seed()
-    q_rand = config(random.randint(0,dim_x), random.randint(0,dim_y))
+    #while True:
+    q_rand = config(random.randint(100,dim_x), random.randint(100,dim_y))
     return q_rand
 
 def near(q_rand, G):
@@ -142,7 +143,6 @@ if __name__ == "__main__":
 
                 if not inobs:
                     break
-            printc(q_rand)
 
             q_near = near(q_rand, G)
 
@@ -154,12 +154,14 @@ if __name__ == "__main__":
                     break
             if inobs2:
                 continue
+            printc(q_rand)
+            printc(q_near)
             printc(q_new)
 
             print("\n")
 
 
-            if int(q_new.x) == int(q_goal.x) and int(q_new.y) == int(q_goal.y):
+            if abs(q_goal.x - q_new.x) < 5 and abs(q_goal.y - q_new.y) < 5:
                 printc(q_new)
                 print("FOUND GOAL")
                 goal_found = True
